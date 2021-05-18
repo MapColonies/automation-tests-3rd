@@ -9,10 +9,12 @@ class ResponseCode(enum.Enum):
     Types of server responses
     """
     Ok = 200  # server return ok status
+    IngestionModelOk = 201
     ValidationErrors = 400  # bad request
     StatusNotFound = 404  # status\es not found on db
     ServerError = 500  # problem with error
     DuplicatedError = 409  # in case of requesting package with same name already exists
+    GetwayTimeout = 504
 
 
 #############################################      Running global environment variables     ################################################

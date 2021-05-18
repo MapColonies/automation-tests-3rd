@@ -25,4 +25,6 @@ def send_ingestion_request(request, request_name=None):
     # request = json.dumps(request)
     im = model_ingestion.IngestionModel()
     resp = im.post_model_ingestion_job(request)
-    print(resp)
+    status_code, content = common.response_parser(resp)
+    _logger.info('Response of trigger returned with status: %d', status_code)
+    return status_code, content

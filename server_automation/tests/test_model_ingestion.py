@@ -25,6 +25,10 @@ def test_upload_model():
         f'Test: [{test_upload_model.__name__}] Failed: File not exist or failure on loading request json'
     identifier = "_".join(['test_upload_model', Z_TIME])
     request['metadata']['identifier'] = identifier
-    exc.send_ingestion_request(request)
+
+    # start ingestion
+    s_code, content = exc.send_ingestion_request(request)
+    assert s_code == config.ResponseCode.IngestionModelOk.value, \
+        f'Test: [{test_upload_model.__name__}] Failed: Ingestion model api return status code [{s_code}]'
 
 test_upload_model()
