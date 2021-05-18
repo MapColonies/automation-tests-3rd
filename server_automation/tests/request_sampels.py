@@ -20,54 +20,58 @@ from server_automation.configuration import config
 #     default = 18
 #     med = 15
 
+class RequestsPool(enum.Enum):
+    sanity = 1,
+
 
 _sanity_request = {
-  "modelPath": "/mo",
-  "metadata": {
-    "identifier": "string",
-    "typename": "string",
-    "schema": "string",
-    "mdSource": "string",
-    "xml": "string",
-    "anytext": "string",
-    "insertDate": "2021-05-10T10:34:23.385Z",
-    "creationDate": "2021-05-10T10:34:23.385Z",
-    "validationDate": "2021-05-10T10:34:23.385Z",
-    "wktGeometry": "POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))",
-    "title": "string",
-    "producerName": "IDFMU",
-    "description": "string",
-    "type": "string",
-    "classification": "string",
-    "srs": "string",
-    "projectName": "string",
-    "version": "string",
-    "centroid": "string",
-    "footprint": "string",
-    "timeBegin": "2021-05-10T10:34:23.385Z",
-    "timeEnd": "2021-05-10T10:34:23.385Z",
-    "sensorType": "string",
-    "region": "string",
-    "nominalResolution": "string",
-    "accuracyLE90": "string",
-    "horizontalAccuracyCE90": "string",
-    "relativeAccuracyLE90": "string",
-    "estimatedPrecision": "string",
-    "measuredPrecision": "string",
-    "links": [
-      {
-        "name": "string",
+    "modelPath": "/home/libotadmin/NewYorkCity3d",
+    "metadata": {
+        "identifier": "1234",
+        "typename": "string",
+        "schema": "string",
+        "mdSource": "string",
+        "xml": "string",
+        "anytext": "string",
+        "insertDate": "2021-04-29T10:04:58.830Z",
+        "creationDate": "2021-04-29T10:04:58.830Z",
+        "validationDate": "2021-04-29T10:04:58.830Z",
+        "wktGeometry": "POLYGON((34.8076891807199 31.9042863434239,34.816135996859 31.9042863434239,34.816135996859 31.9118071956932,34.8076891807199 31.9118071956932,34.8076891807199 31.9042863434239))",
+        "title": "string",
+        "producerName": "IDFMU",
         "description": "string",
-        "protocol": "string",
-        "url": "string"
-      }
-    ]
-  }
+        "type": "string",
+        "classification": "string",
+        "srs": "string",
+        "projectName": "string",
+        "version": "string",
+        "centroid": "string",
+        "footprint": "string",
+        "timeBegin": "2021-04-29T10:04:58.830Z",
+        "timeEnd": "2021-04-29T10:04:58.830Z",
+        "sensorType": "string",
+        "region": "string",
+        "nominalResolution": "string",
+        "accuracyLE90": "string",
+        "horizontalAccuracyCE90": "string",
+        "relativeAccuracyLE90": "string",
+        "estimatedPrecision": "string",
+        "measuredPrecision": "string",
+        "links": [
+            {
+                "name": "string",
+                "description": "string",
+                "protocol": "string",
+                "url": "string"
+            }
+        ]
+    }
 }
 
 
-
-
-
-
-
+def get_request(name):
+    """
+  This method provide 3rd valid json request by passing request name
+  """
+    if name == RequestsPool.sanity.name:
+        return _sanity_request
