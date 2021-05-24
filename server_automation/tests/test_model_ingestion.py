@@ -40,4 +40,14 @@ def test_upload_model():
     assert res, \
         f'Test: [{test_upload_model.__name__}] Failed: on follow (ingestion job stage) with message: [{err}]'
 
-# test_upload_model()
+    try:
+        res, errors = exc.validate_ingested_model(identifier, request)
+        err = errors
+    except Exception as e:
+        err = str(e)
+
+    assert res, \
+        f'Test: [{test_upload_model.__name__}] Failed: validation metadata (model on catalog db) with message: [{err}]'
+
+
+test_upload_model()

@@ -33,10 +33,33 @@ class IngestionModel:
         if not isinstance(job_id, str):
             _log.error(f'should be provided job id string expressed as uuid:\n{job_id} => {type(job_id)}')
             raise TypeError('Request should be provided as valid json format')
-        ull_model_ingestion_url = common.combine_url(self._ingestion_job_service_url, config.INGESTION_3RD_JOB_STATUS, job_id)
-        resp = br.send_get_request(ull_model_ingestion_url)
-        return resp
+        job_model_ingestion_url = common.combine_url(self._ingestion_job_service_url, config.INGESTION_3RD_JOB_STATUS, job_id)
 
-    def get_single_3rd_metadata(self,identifier):
+        try:
+            resp = br.send_get_request(job_model_ingestion_url)
+            return resp
+        except Exception as e:
+            _log.error(f'Error on get response from ingestion job progress service with error {str(e)}')
+
+    def is_model_on_catalog(self, identifier):
+        """
+        This method validate if model exists on catalog based on provided identifier
+        :param identifier: string represented ingested 3rd model
+        """
+        resp = self.get_single_3rd_metadata(identifier)
+        return True if resp.status_code == config.ResponseCode.Ok.value else False
+
+    def get_single_3rd_metadata(self, identifier):
         """This method return specific exists metadata from catalog db"""
+        if not isinstance(identifier, str):
+            _log.error(f'should be provided identifier expressed as string:\n{identifier} => {type(identifier)}')
+            raise TypeError('identifier should be provided as valid json format')
+        model_metadata_on_catalog_url = common.combine_url(self._ingestion_catalog_url, config.INGESTION_CATALOG_MODEL_DATA, identifier)
+
+        try:
+            resp = br.send_get_request(model_metadata_on_catalog_url)
+            return resp
+        except Exception as e:
+            _log.error(f'Error on get response from catalog db service with error {str(e)}')
+            raise e
 
