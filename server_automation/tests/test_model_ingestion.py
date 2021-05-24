@@ -30,5 +30,14 @@ def test_upload_model():
     s_code, content = exc.send_ingestion_request(request)
     assert s_code == config.ResponseCode.IngestionModelOk.value, \
         f'Test: [{test_upload_model.__name__}] Failed: Ingestion model api return status code [{s_code}]'
+    job_id = content['jobId']
+    res = None
+    try:
+        err = 'unknown'
+        res = exc.follow_ingestion_model_process(job_id)
+    except Exception as e:
+        err = str(e)
+    assert res, \
+        f'Test: [{test_upload_model.__name__}] Failed: on follow (ingestion job stage) with message: [{err}]'
 
-test_upload_model()
+# test_upload_model()

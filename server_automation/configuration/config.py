@@ -26,6 +26,8 @@ INGESTION_CATALOG_URL = common.get_environment_variable('INGESTION_CATALOG_URL',
 INGESTION_JOB_SERVICE_URL = common.get_environment_variable('INGESTION_JOB_SERVICE_URL', 'http://ingestion-stack-discrete-ingestion-db-route-3d.apps.v0h0bdx6.eastus.aroapp.io/')
 ##################################################  Ingestion API's sub urls & API's  ######################################################
 INGESTION_3RD_MODEL = 'models'
+INGESTION_3RD_JOB_STATUS = 'jobs'
+INGESTION_CATALOG_MODEL_DATA = 'metadata'
 ################################################################## S3 ######################################################################
 S3_DOWNLOAD_EXPIRATION_TIME = common.get_environment_variable("S3_DOWNLOAD_EXPIRED_TIME", 3600)
 S3_DOWNLOAD_DIRECTORY = common.get_environment_variable('S3_DOWNLOAD_DIR', '/tmp/')
@@ -36,3 +38,10 @@ S3_END_POINT = common.get_environment_variable('S3_END_POINT', None)
 ###################################################################### general ##############################################################
 USE_JIRA = common.get_environment_variable('USE_JIRA', False)
 INGESTION_MENDATORY_PARAMS = ['modelPath', ]
+MAX_INGESTION_RUNNING_TIME = common.get_environment_variable('MAX_INGESTION_RUNNING_TIME', 5*60)
+
+################################################  Ingestion job Status Service - STATUSES  ##############################################
+INGESTION_STATUS_IN_PROGRESS = "In-Progress"
+INGESTION_STATUS_COMPLITED = "Completed"
+INGESTION_STATUS_PENDING = "Pending"
+INGESTION_STATUS_FAILED = "Failed"
