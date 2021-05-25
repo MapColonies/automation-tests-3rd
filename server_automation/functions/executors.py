@@ -27,7 +27,7 @@ def send_ingestion_request(request, request_name=None):
     try:
         resp = im.post_model_ingestion_job(request)
         status_code, content = common.response_parser(resp)
-        _logger.info('Response of trigger returned with status: %d', status_code)
+        _logger.info('Response of [3d model ingestion service] returned with status: %d', status_code)
     except Exception as e:
         status_code = config.ResponseCode.ServerError.value
         content = str(e)
@@ -72,6 +72,8 @@ def follow_ingestion_model_process(job_id):
         _logger.info(
             f'Received from job(id): {job_id} ,with status code: {status_code}, status: {status} and percentage: {percentage}')
 
+        if status == config.INGESTION_STATUS_FAILED:
+            raise RuntimeError(f'Ingestion job {job_id} failed [status={status}] with content:\n{content}')
         if current_time > t_end:
             _logger.error("Got timeout and will stop running progress validation")
             raise Exception("got timeout while following task running")
@@ -122,16 +124,34 @@ def validate_ingested_model(identifier, request):
     :param request: original ingestion request for model
     """
     im = model_ingestion.IngestionModel()
+    _logger.info(f'Validating job:{identifier} placed on catalog db')
     if im.is_model_on_catalog(identifier):
+        _logger.info(f'[OK] job:{identifier} placed on catalog db')
+        _logger.info(f'Validating metadata of job:{identifier}')
         res = im.get_single_3rd_metadata(identifier)
         status_code = res.status_code
         if status_code == config.ResponseCode.Ok.value:
             content = json.loads(res.text)
             res, res_dict = compare_model_metadata(content, request['metadata'])
+            _logger.info(f'Metadata of job:{identifier} validation ok {[res]}')
             return res, res_dict
 
         else:
+            _logger.error(f'Model with identifier:{identifier} return status: {status_code} from service catalog ')
             raise Exception(f'Model with identifier:{identifier} return status: {status_code} from service catalog ')
 
     else:
+        _logger.error(f'Model with identifier:{identifier} not exists on catalog db ')
         raise Exception(f'Model with identifier:{identifier} not exists on catalog db ')
+
+
+def validate_model_on_storage(identifier):
+    """
+    This method validate uploaded model on storage OS / FS based on provided url from catalog db
+    :param identifier: model's identifier
+    """
+    im = model_ingestion.IngestionModel()
+    _logger.info(f'Validating job:{identifier} placed on storage according tileset.json file')
+    res = im.get_single_3rd_metadata(identifier)
+    content = json.loads(res.text)
+    url = content['links'].split(',')[3]

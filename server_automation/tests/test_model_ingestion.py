@@ -30,6 +30,8 @@ def test_upload_model():
     s_code, content = exc.send_ingestion_request(request)
     assert s_code == config.ResponseCode.IngestionModelOk.value, \
         f'Test: [{test_upload_model.__name__}] Failed: Ingestion model api return status code [{s_code}]'
+
+    # validating running ingestion process
     job_id = content['jobId']
     res = None
     try:
@@ -40,6 +42,7 @@ def test_upload_model():
     assert res, \
         f'Test: [{test_upload_model.__name__}] Failed: on follow (ingestion job stage) with message: [{err}]'
 
+    # validating metadata of new ingested model
     try:
         res, errors = exc.validate_ingested_model(identifier, request)
         err = errors
@@ -49,5 +52,13 @@ def test_upload_model():
     assert res, \
         f'Test: [{test_upload_model.__name__}] Failed: validation metadata (model on catalog db) with message: [{err}]'
 
+    # validating new model on storage
+    try:
+        err = 'unknown'
+        res = exc.validate_model_on_storage(identifier)
+    except Exception as e:
+        err = str(e)
+    # assert res, \
+    #     f'Test: [{test_upload_model.__name__}] Failed: on Storage validation with message: [{err}]'
 
-test_upload_model()
+# test_upload_model()
