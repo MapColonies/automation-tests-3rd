@@ -3,7 +3,7 @@ name: build_and_push_image_to_azure
 on:
   push:
     tags:
-      - 'v*'
+      - '*'
 
 jobs:
 
