@@ -182,6 +182,7 @@ def validate_model_on_storage(identifier, job_id):
     :param identifier: model's identifier
     :param job_id: uuid represent the ingestion id for the specific model
     """
+    tileset = None
     im = model_ingestion.IngestionModel()
     _logger.info(f'Validating job:{identifier} placed on storage according tileset.json file')
     res = im.get_single_3rd_metadata(identifier)
