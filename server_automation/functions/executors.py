@@ -25,6 +25,7 @@ def send_ingestion_request(request, request_name=None):
     # request = json.dumps(request)
     im = model_ingestion.IngestionModel()
     try:
+        _logger.info(f'Will load model from directory: {request["modelPath"]}')
         resp = im.post_model_ingestion_job(request)
         status_code, content = common.response_parser(resp)
         _logger.info('Response of [3d model ingestion service] returned with status: %d', status_code)
@@ -58,7 +59,7 @@ def follow_ingestion_model_process(job_id):
             raise RuntimeError(f'Error on ingestion job status service with error {status_code}:{resp.text}')
 
         if status == config.INGESTION_STATUS_FAILED:
-            raise Exception("Failed on ingestion on task %s" % job_id)
+            raise Exception(f"Failed on ingestion on task {job_id}:{content['reason']}")
         if not status == config.INGESTION_STATUS_COMPLITED:
             time.sleep(10)
             # retry_completed += 1
@@ -145,13 +146,58 @@ def validate_ingested_model(identifier, request):
         raise Exception(f'Model with identifier:{identifier} not exists on catalog db ')
 
 
-def validate_model_on_storage(identifier):
+def get_tileset_from_s3(identifier, job_id):
+    """
+    This method download relevant tileset.json directly from s3 by identifier
+    """
+    try:
+        s3_client = s3.S3Client(config.S3_END_POINT, config.S3_ACCESS_KEY, config.S3_SECRET_KEY)
+        bucket_exists = s3_client.is_bucket_exists(config.S3_BUCKET_NAME)
+        source = common.combine_url(job_id, 'tileset.json')
+
+        destination_dir = os.path.join(config.TMP_DIR, job_id)
+        if not os.path.exists(destination_dir):
+            os.makedirs(destination_dir)
+        dest = os.path.join(config.TMP_DIR, source)
+        if bucket_exists[0]:
+            try:
+                s3_client.download_from_s3(config.S3_BUCKET_NAME, source, dest)
+                return os.path.join(config.TMP_DIR, job_id,'tileset.json')
+            except Exception as e:
+                _logger.error(f'Failed on downloading {identifier}/tileset.json from S3 with error: {str(e)}')
+                raise Exception(f'Failed on downloading {identifier}/tileset.json from S3 with error: {str(e)}')
+
+        else:
+            _logger.error(f'Failed on connecting to bucket with error: {bucket_exists[2]}')
+            raise Exception(f'Failed on connecting to bucket with error: {bucket_exists[2]}')
+
+    except Exception as e:
+        _logger.error(f'Failed on connecting S3 with error: {str(e)}')
+        raise Exception(f'Failed on connecting S3 with error: {str(e)}')
+
+
+def validate_model_on_storage(identifier, job_id):
     """
     This method validate uploaded model on storage OS / FS based on provided url from catalog db
     :param identifier: model's identifier
+    :param job_id: uuid represent the ingestion id for the specific model
     """
     im = model_ingestion.IngestionModel()
     _logger.info(f'Validating job:{identifier} placed on storage according tileset.json file')
     res = im.get_single_3rd_metadata(identifier)
     content = json.loads(res.text)
     url = content['links'].split(',')[3]
+    if config.S3_TILE_LINK_SOURCE:
+        tileset = get_tileset_from_s3(identifier, job_id)
+        tileset = json.load(open(tileset))
+    else:
+        try:
+            tileset = br.send_get_request(url)
+        except Exception as e:
+            _logger.error(f'Failed on downloading tileset.json file!\n'
+                          f'Given url {url}\n'
+                          f'With error: {str(e)}')
+
+    _logger.info(f'New model placed OK on storage ')
+
+    return tileset

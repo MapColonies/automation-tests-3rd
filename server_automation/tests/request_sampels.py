@@ -25,7 +25,7 @@ class RequestsPool(enum.Enum):
 
 
 _sanity_request = {
-    "modelPath": "/home/libotadmin/NewYorkCity3d",
+    "modelPath": "/home/libotadmin/NewYork",
     "metadata": {
         "identifier": "1234",
         "typename": "string",

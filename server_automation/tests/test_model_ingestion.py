@@ -55,10 +55,10 @@ def test_upload_model():
     # validating new model on storage
     try:
         err = 'unknown'
-        res = exc.validate_model_on_storage(identifier)
+        res = exc.validate_model_on_storage(identifier, job_id)
     except Exception as e:
         err = str(e)
-    # assert res, \
-    #     f'Test: [{test_upload_model.__name__}] Failed: on Storage validation with message: [{err}]'
+    assert res, \
+        f'Test: [{test_upload_model.__name__}] Failed: on Storage validation with message: [{err}]'
 
-# test_upload_model()
+test_upload_model()

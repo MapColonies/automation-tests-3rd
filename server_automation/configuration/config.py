@@ -32,6 +32,7 @@ INGESTION_3RD_MODEL = 'models'
 INGESTION_3RD_JOB_STATUS = 'jobs'
 INGESTION_CATALOG_MODEL_DATA = 'metadata'
 ####################################################### S3 #############################################################
+S3_TILE_LINK_SOURCE = common.get_environment_variable("S3_TILE_LINK_SOURCE", False)
 S3_DOWNLOAD_EXPIRATION_TIME = common.get_environment_variable("S3_DOWNLOAD_EXPIRED_TIME", 3600)
 S3_DOWNLOAD_DIRECTORY = common.get_environment_variable('S3_DOWNLOAD_DIR', '/tmp/')
 S3_BUCKET_NAME = common.get_environment_variable('S3_BUCKET_NAME', None)
